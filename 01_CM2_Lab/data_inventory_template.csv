@@ -1,0 +1,8 @@
+dataset,file_or_table,description_one_sentence,business_domain,data_owner,data_steward,data_custodian,contains_personal_data_Y_N,sensitivity_level,refresh_frequency,row_count,issues_spotted
+customers,data/customers.csv | raw.customers,,,,,,,,,,
+products,data/products.csv | raw.products,,,,,,,,,,
+orders,data/orders.csv | raw.orders,,,,,,,,,,
+order_items,data/order_items.csv | raw.order_items,,,,,,,,,,
+payments,data/payments.csv | raw.payments,,,,,,,,,,
+support_tickets,data/support_tickets.csv | raw.support_tickets,,,,,,,,,,
+marketing_campaign_export,data/marketing_campaign_export.csv | raw.marketing_campaign_export,,,,,,,,,,

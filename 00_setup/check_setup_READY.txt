@@ -1,0 +1,24 @@
+=== Data Governance course - setup check ===
+
+System: Darwin 25.6.0 | Python 3.12.16
+
+[OK  ] Python 3.11 or 3.12
+[OK  ] RAM: 8.0 GB (8 GB is enough)
+[OK  ] Free disk: 29.3 GB (need 10 GB)
+[OK  ] Python package: pandas
+[OK  ] Python package: DuckDB
+[OK  ] Python package: Great Expectations
+[OK  ] Python package: Presidio analyzer
+[OK  ] Python package: Presidio anonymizer
+[OK  ] Python package: psycopg2 (Postgres driver)
+[OK  ] spaCy model en_core_web_sm
+[OK  ] dbt CLI (dbt --version)
+[OK  ] datacontract CLI
+[OK  ] Git
+[OK  ] Docker is running
+[OK  ] ShopFast database loaded (1241 customers)
+[OK  ] OpenRefine is running on http://127.0.0.1:3333
+
+==============================
+   READY for the 24 Nov lab  :-)
+==============================
