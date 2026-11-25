@@ -14,3 +14,8 @@ __pycache__/
 
 # Great Expectations generated context (keep the .py script + a screenshot, not the whole folder)
 gx/
+
+# dbt artifacts
+target/
+dbt_packages/
+logs/

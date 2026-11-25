@@ -1,0 +1,155 @@
+version: 2
+
+# CTP 3 - Exercise 1: document and govern the staging models.
+# For each model: description, meta (owner, steward, domain, tier); for each column: description,
+# and for personal data: tags: ['pii'] + meta: {classification: confidential|restricted}.
+
+models:
+  - name: stg_customers
+    description: "One row per customer account, cleaned from raw.customers (exact duplicate rows removed, ISO country codes, ISO dates)."
+    meta:
+      owner: "Sara Martin (Head of Sales)"
+      steward: "Karim Benali (Analytics Engineer)"
+      domain: customer
+      tier: gold
+    columns:
+      - name: customer_id
+        description: "Technical identifier of the customer account. One person may have several accounts (see duplicates)."
+        data_tests: [unique, not_null]
+      - name: first_name
+        description: "Customer first name, proper-cased."
+        tags: ['pii']
+        meta: {classification: confidential}
+      - name: last_name
+        description: "Customer last name, proper-cased."
+        tags: ['pii']
+        meta: {classification: confidential}
+      - name: email
+        description: "Login email, trimmed and lower-cased."
+        tags: ['pii']
+        meta: {classification: confidential}
+      - name: phone
+        description: "Customer phone number (mixed national/international formats)."
+        tags: ['pii']
+        meta: {classification: confidential}
+      - name: birth_date
+        description: "Customer date of birth, parsed to a DATE. High identity-theft risk."
+        tags: ['pii']
+        meta: {classification: restricted}
+      - name: city
+        description: "Customer city of residence (part of the postal address)."
+        tags: ['pii']
+        meta: {classification: confidential}
+      - name: country_code
+        description: "Customer country as an ISO-2 code (FR, DE, ES, BE)."
+        data_tests:
+          - accepted_values:
+              values: ['FR', 'DE', 'ES', 'BE']
+      - name: signup_date
+        description: "Date the account was created, parsed to a DATE."
+      - name: has_marketing_consent
+        description: "Boolean: the customer agreed to receive marketing (GDPR consent)."
+      - name: loyalty_tier
+        description: "Loyalty level, lower-cased and de-typoed (platinium -> platinum)."
+        data_tests:
+          - accepted_values:
+              values: ['bronze', 'silver', 'gold', 'platinum']
+
+  - name: stg_orders
+    description: "One row per order, cleaned from raw.orders (duplicate order_ids removed, canonical status, typed amount)."
+    meta:
+      owner: "Sara Martin (Head of Sales)"
+      steward: "Karim Benali (Analytics Engineer)"
+      domain: sales
+      tier: gold
+    columns:
+      - name: order_id
+        description: "Technical identifier of the order (unique)."
+        data_tests: [unique, not_null]
+      - name: customer_id
+        description: "Customer who placed the order (foreign key to stg_customers)."
+      - name: order_date
+        description: "Date the order was placed (DATE)."
+      - name: status
+        description: "Order lifecycle status, canonical lower-case."
+        data_tests:
+          - accepted_values:
+              values: ['pending', 'shipped', 'delivered', 'cancelled', 'returned']
+      - name: channel
+        description: "Sales channel the order came from (web, mobile_app, marketplace)."
+      - name: shipping_country
+        description: "Destination country of the shipment (ISO-2)."
+      - name: total_amount_eur
+        description: "Gross order amount in EUR, VAT included, decimal(10,2)."
+
+  - name: stg_order_items
+    description: "One row per product line of an order (quantity and unit price)."
+    meta:
+      owner: "Sara Martin (Head of Sales)"
+      steward: "Karim Benali (Analytics Engineer)"
+      domain: sales
+      tier: silver
+    columns:
+      - name: order_item_id
+        description: "Technical identifier of the order line."
+        data_tests: [unique, not_null]
+      - name: order_id
+        description: "Order this line belongs to (foreign key to stg_orders)."
+      - name: product_id
+        description: "Product sold on this line (foreign key to stg_products)."
+      - name: quantity
+        description: "Number of units ordered on this line."
+      - name: unit_price_eur
+        description: "Unit price in EUR at the time of the order, decimal(10,2)."
+
+  - name: stg_payments
+    description: "One row per payment event from the payment provider (captured or refunded)."
+    meta:
+      owner: "Paul Girard (Head of Finance)"
+      steward: "Karim Benali (Analytics Engineer)"
+      domain: finance
+      tier: gold
+    columns:
+      - name: payment_id
+        description: "Technical identifier of the payment event."
+        data_tests: [unique, not_null]
+      - name: order_id
+        description: "Order this payment is for (foreign key to stg_orders)."
+      - name: payment_date
+        description: "Date the payment was processed (DATE)."
+      - name: method
+        description: "Payment method (card, paypal, apple_pay, bank_transfer)."
+      - name: amount
+        description: "Payment amount in EUROS with 2 decimals (NOT cents). The unit is the key control - the CTP 2 incident was euros stored as cents."
+      - name: currency
+        description: "ISO currency code of the payment (EUR for this training dataset)."
+      - name: card_last4
+        description: "Last 4 digits of the payment card, when the method is card."
+        tags: ['pii']
+        meta: {classification: confidential}
+      - name: payment_status
+        description: "Payment outcome (captured or refunded)."
+
+  - name: stg_products
+    description: "Product catalogue with list prices, cleaned from raw.products."
+    meta:
+      owner: "Lea Dubois (Head of Merchandising)"
+      steward: "Karim Benali (Analytics Engineer)"
+      domain: product
+      tier: silver
+    columns:
+      - name: product_id
+        description: "Technical identifier of the product."
+        data_tests: [unique, not_null]
+      - name: sku
+        description: "Stock-keeping unit (business product code)."
+      - name: product_name
+        description: "Display name of the product."
+      - name: category
+        description: "Product category, proper-cased."
+      - name: list_price_eur
+        description: "Catalogue list price in EUR, decimal(10,2)."
+      - name: supplier
+        description: "Supplier name for the product."
+      - name: is_active
+        description: "Boolean: the product is currently sold."
