@@ -11,3 +11,6 @@ __pycache__/
 
 # Local databases
 *.duckdb
+
+# Great Expectations generated context (keep the .py script + a screenshot, not the whole folder)
+gx/

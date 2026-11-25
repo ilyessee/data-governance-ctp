@@ -1,0 +1,20 @@
+dimension,rule_in_plain_words,column,how_you_measured_it,failing_rows,total_rows,score_pct,severity_high_medium_low,who_should_fix_owner_steward_custodian
+Completeness,email is filled,email,blank(email),48,1241,96.1,Medium,Owner (fix signup form)
+Completeness,country is filled,country,blank(country),37,1241,97.0,Medium,Owner (fix signup form)
+Uniqueness,customer_id is unique,customer_id,duplicated(customer_id),16,1241,98.7,High,Steward (merge policy)
+Uniqueness,one account per person,email,duplicate lower-cased email,120,1241,90.3,High,Steward (merge policy)
+Validity,email looks like an email,email,"regex ^[^@\s]+@[^@\s]+\.[a-zA-Z]{2,}$",19,1241,98.5,Medium,Owner (form validation)
+Validity,loyalty_tier in bronze/silver/gold/platinum,loyalty_tier,lower() not in set,4,1241,99.7,Low,Custodian (normalise in transform)
+Validity,French postal code has 5 digits,postal_code,FR rows not matching ^\d{5}$,48,1241,96.1,Medium,Custodian (pad leading 0 in transform)
+Consistency,country is an ISO-2 code,country,"value not in {FR,DE,ES,BE}",299,1241,75.9,Medium,Custodian (standardise in transform)
+Consistency,signup_date is YYYY-MM-DD,signup_date,not matching ^\d{4}-\d{2}-\d{2}$,303,1241,75.6,Low,Custodian (parse in transform)
+Accuracy,birth_date is plausible (1906..today-18y),birth_date,parsed date out of range,8,1241,99.4,Medium,Owner (validate at entry)
+Timeliness,signup_date is not in the future,signup_date,parsed date > today,0,1241,100.0,Medium,Owner (source validation)
+
+"# ---- orders (GX, Exercise 3) ----"
+Uniqueness,order_id is unique,order_id,GX ExpectColumnValuesToBeUnique - CRITICAL: stop the load,14,5207,99.7,high,Custodian (stop load) + Owner
+Validity,customer_id exists in customers (foreign key),customer_id,GX ExpectColumnValuesToBeInSet(customers) - quarantine bad rows,14,5207,99.7,high,Steward (quarantine)
+Completeness,order_date is filled,order_date,GX ExpectColumnValuesToNotBeNull,11,5207,99.8,medium,Steward
+Accuracy,order_date is not in the future,order_date_dt,GX ExpectColumnValuesToBeBetween(max=today),5,5207,99.9,medium,Steward
+Consistency,status in pending/shipped/delivered/cancelled/returned,status,GX ExpectColumnValuesToBeInSet - fix in transform,9,5207,99.8,medium,Custodian (fix in transform)
+Validity,total_amount_eur > 0 and < 10000,total_amount_eur,GX ExpectColumnValuesToBeBetween - CRITICAL: negative/zero = money,6,5207,99.9,high,Custodian (stop load) + Owner
